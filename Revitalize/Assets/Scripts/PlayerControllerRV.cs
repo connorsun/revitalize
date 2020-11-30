@@ -12,6 +12,8 @@ public class PlayerControllerRV : MonoBehaviour
     private float prevyinput;
     private Rigidbody2D rb;
     public float speed;
+    public float xaccel;
+    public float yaccel;
     
     // Start is called before the first frame update
     void Start()
@@ -28,9 +30,11 @@ public class PlayerControllerRV : MonoBehaviour
         yinput = 0;
         prevyheld = false;
         prevyinput = 0;
-        speed = 6;
+        speed = 5;
         rb.position = new Vector3(0f,0f,0f);
         rb.velocity = new Vector3(0f,0f,0f);
+        xaccel = 0f;
+        yaccel = 0f;
     }
 
     void ObjectSetup()
@@ -75,6 +79,12 @@ public class PlayerControllerRV : MonoBehaviour
             yinput = 0f;
             prevyheld = false;
         }
-        rb.velocity = new Vector2(xinput*speed,yinput*speed);
+        if (Mathf.Abs(xaccel/speed) < 1 || xinput == 0) {
+            xaccel = Mathf.Lerp(xaccel, speed*xinput, 0.2f);
+        }
+        if (Mathf.Abs(yaccel/speed) < 1 || yinput == 0) {
+            yaccel = Mathf.Lerp(yaccel, speed*yinput, 0.2f);
+        }
+        rb.velocity = new Vector2(xaccel,yaccel);
     }
 }
