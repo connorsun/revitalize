@@ -11,9 +11,11 @@ public class PlayerControllerRV : MonoBehaviour
     private bool prevyheld;
     private float prevyinput;
     private Rigidbody2D rb;
+    private SpriteRenderer sr;
     public float speed;
     public float xaccel;
     public float yaccel;
+    private int frameCounter;
     
     // Start is called before the first frame update
     void Start()
@@ -35,16 +37,19 @@ public class PlayerControllerRV : MonoBehaviour
         rb.velocity = new Vector3(0f,0f,0f);
         xaccel = 0f;
         yaccel = 0f;
+        frameCounter = 0;
     }
 
     void ObjectSetup()
     {
         rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        frameCounter++;
         if (Input.GetButton("Left")  && !Input.GetButton("Right")) {
             xinput = -1f;
             prevxheld = false;
@@ -86,5 +91,18 @@ public class PlayerControllerRV : MonoBehaviour
             yaccel = Mathf.Lerp(yaccel, speed*yinput, 0.2f);
         }
         rb.velocity = new Vector2(xaccel,yaccel);
+        if (frameCounter % 2 == 0) {
+            CreateGhost();
+        }
+    }
+
+    void CreateGhost() {
+        GameObject ghost = new GameObject();
+        ghost.transform.position = transform.position;
+        SpriteRenderer ghostsr = ghost.AddComponent<SpriteRenderer>();
+        ghostsr.sprite = sr.sprite;
+        ghostsr.sortingOrder = -3;
+        ghost.AddComponent<FaderRV>();
+        ghost.name = "playerGhost";
     }
 }
