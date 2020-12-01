@@ -45,8 +45,9 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\DungeonPlayerRV.cs" />
      <Compile Include="Assets\Scripts\FaderRV.cs" />
-     <Compile Include="Assets\Scripts\PlayerControllerRV.cs" />
+     <Compile Include="Assets\Scripts\PlayerTemplateRV.cs" />
  <Reference Include="UnityEngine">
  <HintPath>/Applications/Unity/Unity.app/Contents/Managed/UnityEngine/UnityEngine.dll</HintPath>
  </Reference>
