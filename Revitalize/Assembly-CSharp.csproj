@@ -40,6 +40,7 @@
      <Compile Include="Assets\Scripts\DungeonPlayerRV.cs" />
      <Compile Include="Assets\Scripts\FaderRV.cs" />
      <Compile Include="Assets\Scripts\GoblinRV.cs" />
+     <Compile Include="Assets\Scripts\HugAttackRV.cs" />
     <Reference Include="UnityEngine">
         <HintPath>/Applications/Unity/Hub/Editor/2020.1.12f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

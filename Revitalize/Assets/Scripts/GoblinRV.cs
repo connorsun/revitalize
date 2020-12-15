@@ -14,13 +14,17 @@ public class GoblinRV : MonoBehaviour
     private int roomHeight;
     private GameObject player;
     public float speed;
+    private int hitByType;
+    public bool stop;
+    private float stopTimer;
+    private bool attackStunned;
     
     void Start()
     {
         tm = GameObject.FindWithTag("Walls").GetComponent<Tilemap>();
         roomWidth = 36;
         roomHeight = 20;
-        speed = 0.4f;
+        speed = 1f;
         rb = GetComponent<Rigidbody2D>();
         wallTile = Resources.Load<Tile>("blacksquare");
         player = GameObject.FindWithTag("Player");
@@ -29,7 +33,21 @@ public class GoblinRV : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        rb.velocity = Pathfind(rb.position, player.transform.position) * speed;
+        if (!stop) {
+            rb.velocity = Pathfind(rb.position, player.transform.position) * speed;
+        }
+        if (stop && Time.time > stopTimer) {
+            stop = false;
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other) {
+        if (other.CompareTag("HugAttack")) {
+            stop = true;
+            stopTimer = Time.time + 0.5f;
+            hitByType = 0;
+            attackStunned = true;
+        }
     }
 
     Vector2 Pathfind(Vector2 pos1, Vector2 pos2) {
