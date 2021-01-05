@@ -33,6 +33,7 @@ public class GoblinRV : MonoBehaviour
         wallTile = Resources.Load<Tile>("blacksquare");
         player = GameObject.FindWithTag("Player");
         health = 1;
+        attackStamp = Time.time;
     }
 
     // Update is called once per frame
@@ -40,6 +41,9 @@ public class GoblinRV : MonoBehaviour
     {
         if (!stop) {
             rb.velocity = Pathfind(rb.position, player.transform.position) * speed;
+            /*if (Time.time > attackStamp + 3f) {
+                Attack();
+            }*/
         }
         if (stop && Time.time > stopTimer) {
             stop = false;
@@ -53,6 +57,28 @@ public class GoblinRV : MonoBehaviour
         }
         if (health == 0) {
             Destroy(gameObject);
+        }
+    }
+
+    void Attack() {
+        float initialDir = 0;
+        if (emotionType == 1) {
+            initialDir = Mathf.PI/4;
+        }
+        if (emotionType == 2) {
+            for (int i = 0; i < 8; i++) {
+            GameObject atk = Instantiate(Resources.Load<GameObject>("Prefabs/EnemyAttack") as GameObject);
+            atk.transform.position = transform.position;
+            atk.GetComponent<GoblinCryRV>().dir = initialDir;
+            initialDir += Mathf.PI/4;
+            }
+        } else {
+            for (int i = 0; i < 4; i++) {
+                GameObject atk = Instantiate(Resources.Load<GameObject>("Prefabs/EnemyAttack") as GameObject);
+                atk.transform.position = transform.position;
+                atk.GetComponent<GoblinCryRV>().dir = initialDir;
+                initialDir += Mathf.PI/2;
+            }
         }
     }
 
