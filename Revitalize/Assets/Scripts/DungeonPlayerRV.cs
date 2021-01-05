@@ -19,6 +19,7 @@ public class DungeonPlayerRV : MonoBehaviour
     private Vector2 dir;
     public bool inputDisable;
     private float inputDisableTimer = -9.0f;
+    public int health;
     
     // Start is called before the first frame update
     void Start()
@@ -29,6 +30,7 @@ public class DungeonPlayerRV : MonoBehaviour
 
     void Reset()
     {
+        health = 5;
         xinput = 0;
         prevxheld = false;
         prevxinput = 0;
@@ -112,7 +114,7 @@ public class DungeonPlayerRV : MonoBehaviour
         if (Input.GetButton("Action1") && !inputDisable) {
             GameObject hug = Instantiate(Resources.Load<GameObject>("Prefabs/HugAttack") as GameObject);
             hug.transform.parent = this.transform;
-            hug.transform.localPosition = dir * 0.3f;
+            hug.transform.localPosition = dir * 0.5f;
             hug.GetComponent<HugAttackRV>().dir = dir;
             hug.GetComponent<HugAttackRV>().parent = gameObject;
             inputDisable = true;
@@ -130,5 +132,14 @@ public class DungeonPlayerRV : MonoBehaviour
         ghostsr.sortingOrder = -3;
         ghost.AddComponent<FaderRV>();
         ghost.name = "playerGhost";
+    }
+
+    public void Knockback(Vector2 dir, int power) {
+        xaccel = dir.x*power;
+        yaccel = dir.y*power;
+        inputDisable = true;
+        inputDisableTimer = Time.time + 0.5f;
+        xinput = 0;
+        yinput = 0;
     }
 }

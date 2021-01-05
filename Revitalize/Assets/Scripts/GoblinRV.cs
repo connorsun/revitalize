@@ -18,9 +18,13 @@ public class GoblinRV : MonoBehaviour
     public bool stop;
     private float stopTimer;
     private bool attackStunned;
+    public int health;
+    private Vector2 savePushbackDir;
+    private float attackStamp;
     
     void Start()
     {
+        emotionType = Random.Range(0,2);
         tm = GameObject.FindWithTag("Walls").GetComponent<Tilemap>();
         roomWidth = 36;
         roomHeight = 20;
@@ -28,6 +32,7 @@ public class GoblinRV : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         wallTile = Resources.Load<Tile>("blacksquare");
         player = GameObject.FindWithTag("Player");
+        health = 1;
     }
 
     // Update is called once per frame
@@ -38,6 +43,16 @@ public class GoblinRV : MonoBehaviour
         }
         if (stop && Time.time > stopTimer) {
             stop = false;
+            if (attackStunned) {
+                if (hitByType == emotionType) {
+                    health -= 1;
+                } else {
+                    GameObject.FindWithTag("Player").GetComponent<DungeonPlayerRV>().Knockback(-savePushbackDir, 20);
+                }
+            }
+        }
+        if (health == 0) {
+            Destroy(gameObject);
         }
     }
 
@@ -47,6 +62,8 @@ public class GoblinRV : MonoBehaviour
             stopTimer = Time.time + 0.5f;
             hitByType = 0;
             attackStunned = true;
+            rb.velocity = new Vector2(0f,0f);
+            savePushbackDir = other.gameObject.GetComponent<HugAttackRV>().dir;
         }
     }
 

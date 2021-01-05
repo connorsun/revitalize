@@ -24,6 +24,9 @@ public class HugAttackRV : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other) {
         if (other.CompareTag("Enemy")) {
             parent.transform.position = (Vector3) ((Vector2) other.transform.position - dir * 0.3f);
+            parent.GetComponent<Rigidbody2D>().velocity = new Vector3(0f, 0f, 0f);
+            parent.GetComponent<DungeonPlayerRV>().xaccel = 0;
+            parent.GetComponent<DungeonPlayerRV>().yaccel = 0;
         }
     }
 }
