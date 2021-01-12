@@ -21,6 +21,9 @@ public class GoblinRV : MonoBehaviour
     public int health;
     private Vector2 savePushbackDir;
     private float attackStamp;
+    public Vector2 nextNode;
+    private Vector2 prevPos;
+    private float stoppedTimer = -9.0f;
     
     void Start()
     {
@@ -34,13 +37,26 @@ public class GoblinRV : MonoBehaviour
         player = GameObject.FindWithTag("Player");
         health = 1;
         attackStamp = Time.time;
+        nextNode = Pathfind(rb.position, player.transform.position);
+        prevPos = rb.position;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         if (!stop) {
-            rb.velocity = Pathfind(rb.position, player.transform.position) * speed;
+            if (Mathf.Abs(prevPos.x-rb.position.x) < 0.05 && Mathf.Abs(prevPos.y-rb.position.y) < 0.05) {
+                if (Time.time > stoppedTimer + 0.5f) {
+                    stoppedTimer = Time.time;
+                }
+            } else if (Time.time < stoppedTimer + 0.5f) {
+                stoppedTimer = Time.time;
+            }
+            if (Mathf.Abs(nextNode.x-rb.position.x) < 0.1 && Mathf.Abs(nextNode.y-rb.position.y) < 0.1 || Time.time > stoppedTimer + 0.5f) {
+                nextNode = Pathfind(rb.position, player.transform.position);
+                stoppedTimer = Time.time;
+            }
+            rb.velocity = new Vector2(Mathf.Cos(Mathf.Atan2(nextNode.y - rb.position.y, nextNode.x - rb.position.x)), Mathf.Sin(Mathf.Atan2(nextNode.y - rb.position.y, nextNode.x - rb.position.x))) * speed;
             /*if (Time.time > attackStamp + 3f) {
                 Attack();
             }*/
@@ -58,6 +74,7 @@ public class GoblinRV : MonoBehaviour
         if (health == 0) {
             Destroy(gameObject);
         }
+        prevPos = rb.position;
     }
 
     void Attack() {
@@ -94,8 +111,8 @@ public class GoblinRV : MonoBehaviour
     }
 
     Vector2 Pathfind(Vector2 pos1, Vector2 pos2) {
-        pos1 = new Vector2(pos1.x % roomWidth, pos1.y % roomHeight);
-        pos2 = new Vector2(pos2.x % roomWidth, pos2.y % roomHeight);
+        pos1 = new Vector2((pos1.x * 2) % roomWidth, (pos1.y * 2) % roomHeight);
+        pos2 = new Vector2((pos2.x * 2) % roomWidth, (pos2.y * 2) % roomHeight);
         List<List<Node>> allNodes = new List<List<Node>> ();
         for (int x = 0; x < roomWidth; x++) {
             allNodes.Add(new List<Node>());
@@ -117,34 +134,42 @@ public class GoblinRV : MonoBehaviour
         initialNode.g = 0;
         initialNode.h = CalcDist(initialNode, finalNode);
         initialNode.CalcF();
-        while (openList.Count > 0) {
-            Node currentNode = GetLowestNode(openList);
-            if (currentNode == finalNode) {
-                List<Node> path =  CalculatePath(finalNode);
-                if (Mathf.Abs(rb.position.x - path[0].x) < 0.1 && Mathf.Abs(rb.position.y - path[0].y) < 0.1) {
-                    return new Vector2(Mathf.Cos(Mathf.Atan2(path[1].x - rb.position.x, path[1].y - rb.position.y)), Mathf.Sin(Mathf.Atan2(path[1].x - rb.position.x, path[1].y - rb.position.y)));
-                } else {
-                    return new Vector2(Mathf.Cos(Mathf.Atan2(path[0].x - rb.position.x, path[0].y - rb.position.y)), Mathf.Sin(Mathf.Atan2(path[0].x - rb.position.x, path[0].y - rb.position.y)));
+        if (initialNode != finalNode) {
+            while (openList.Count > 0) {
+                Node currentNode = GetLowestNode(openList);
+                if (currentNode == finalNode) {
+                    List<Node> path = CalculatePath(finalNode);
+                    return new Vector2((path[1].x-18)/2, (path[1].y-10)/2);
+                    /*
+                    if (Mathf.Abs(pos1.x - path[0].x) < 0.1 && Mathf.Abs(pos1.y - path[0].y) < 0.1) {
+                        print("noice");
+                        return new Vector2(Mathf.Cos(Mathf.Atan2(path[1].x - pos1.x, path[1].y - pos1.y)), Mathf.Sin(Mathf.Atan2(path[1].x - pos1.x, path[1].y - pos1.y)));
+                    } else {
+                        print(path[0].x);
+                        print(path[0].y);
+                        return new Vector2(Mathf.Cos(Mathf.Atan2(path[0].x - pos1.x, path[0].y - pos1.y)), Mathf.Sin(Mathf.Atan2(path[0].x - pos1.x, path[0].y - pos1.y)));
+                    }
+                    */
                 }
-            }
-            openList.Remove(currentNode);
-            closedList.Add(currentNode);
-            foreach(Node neighborNode in GetNeighborList(currentNode, allNodes)) {
-                if (closedList.Contains(neighborNode)) {
-                    continue;
-                }
-                if (!neighborNode.isWalkable) {
-                    closedList.Add(neighborNode);
-                    continue;
-                }
-                int tentativeG = currentNode.g + CalcDist(currentNode, neighborNode);
-                if (tentativeG < neighborNode.g) {
-                    neighborNode.prevNode = currentNode;
-                    neighborNode.g = tentativeG;
-                    neighborNode.h = CalcDist(neighborNode, finalNode);
-                    neighborNode.CalcF();
-                    if (!openList.Contains(neighborNode)) {
-                        openList.Add(neighborNode);
+                openList.Remove(currentNode);
+                closedList.Add(currentNode);
+                foreach(Node neighborNode in GetNeighborList(currentNode, allNodes)) {
+                    if (closedList.Contains(neighborNode)) {
+                        continue;
+                    }
+                    if (!neighborNode.isWalkable) {
+                        closedList.Add(neighborNode);
+                        continue;
+                    }
+                    int tentativeG = currentNode.g + CalcDist(currentNode, neighborNode);
+                    if (tentativeG < neighborNode.g) {
+                        neighborNode.prevNode = currentNode;
+                        neighborNode.g = tentativeG;
+                        neighborNode.h = CalcDist(neighborNode, finalNode);
+                        neighborNode.CalcF();
+                        if (!openList.Contains(neighborNode)) {
+                            openList.Add(neighborNode);
+                        }
                     }
                 }
             }
