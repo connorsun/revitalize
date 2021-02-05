@@ -27,6 +27,9 @@ public class HugAttackRV : MonoBehaviour
             parent.GetComponent<Rigidbody2D>().velocity = new Vector3(0f, 0f, 0f);
             parent.GetComponent<DungeonPlayerRV>().xaccel = 0;
             parent.GetComponent<DungeonPlayerRV>().yaccel = 0;
+            parent.GetComponent<DungeonPlayerRV>().inputDisableTimer = Time.time + 0.5f;
+            parent.GetComponent<DungeonPlayerRV>().xinput = 0;
+            parent.GetComponent<DungeonPlayerRV>().yinput = 0;
         }
     }
 }

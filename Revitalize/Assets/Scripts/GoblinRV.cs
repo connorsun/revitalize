@@ -20,23 +20,34 @@ public class GoblinRV : MonoBehaviour
     private bool attackStunned;
     public int health;
     private Vector2 savePushbackDir;
-    private float attackStamp;
+    private float attackTimer;
     public Vector2 nextNode;
     private Vector2 prevPos;
     private float stoppedTimer = -9.0f;
+    private Vector2 savePosition;
+    private SpriteRenderer sr;
     
     void Start()
     {
-        emotionType = Random.Range(0,2);
+        sr = GetComponent<SpriteRenderer>();
+        emotionType = Random.Range(0,3);
+        if (emotionType == 0) {
+            sr.color = Color.blue;
+        } else if (emotionType == 1) {
+            sr.color = Color.red;
+        } else if (emotionType == 2) {
+            sr.color = Color.yellow;
+        } 
         tm = GameObject.FindWithTag("Walls").GetComponent<Tilemap>();
         roomWidth = 36;
         roomHeight = 20;
         speed = 1f;
         rb = GetComponent<Rigidbody2D>();
+        savePosition = rb.position;
         wallTile = Resources.Load<Tile>("blacksquare");
         player = GameObject.FindWithTag("Player");
-        health = 1;
-        attackStamp = Time.time;
+        health = 3;
+        attackTimer = Time.time + Random.Range(2f,4f);
         nextNode = Pathfind(rb.position, player.transform.position);
         prevPos = rb.position;
     }
@@ -44,6 +55,24 @@ public class GoblinRV : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (DungeonPlayerRV.resetting > 0) {
+            emotionType = Random.Range(0,3);
+            if (emotionType == 0) {
+                sr.color = Color.blue;
+            } else if (emotionType == 1) {
+                sr.color = Color.red;
+            } else if (emotionType == 2) {
+                sr.color = Color.yellow;
+            } 
+            speed = 1f;
+            rb.position = savePosition;
+            wallTile = Resources.Load<Tile>("blacksquare");
+            player = GameObject.FindWithTag("Player");
+            health = 3;
+            attackTimer = Time.time + Random.Range(2f,4f);
+            nextNode = Pathfind(rb.position, player.transform.position);
+            prevPos = rb.position;
+        }
         if (!stop) {
             if (Mathf.Abs(prevPos.x-rb.position.x) < 0.05 && Mathf.Abs(prevPos.y-rb.position.y) < 0.05) {
                 if (Time.time > stoppedTimer + 0.5f) {
@@ -57,9 +86,10 @@ public class GoblinRV : MonoBehaviour
                 stoppedTimer = Time.time;
             }
             rb.velocity = new Vector2(Mathf.Cos(Mathf.Atan2(nextNode.y - rb.position.y, nextNode.x - rb.position.x)), Mathf.Sin(Mathf.Atan2(nextNode.y - rb.position.y, nextNode.x - rb.position.x))) * speed;
-            /*if (Time.time > attackStamp + 3f) {
+            if (Time.time > attackTimer) {
                 Attack();
-            }*/
+                attackTimer = Time.time + Random.Range(2f,4f);
+            }
         }
         if (stop && Time.time > stopTimer) {
             stop = false;
@@ -107,6 +137,20 @@ public class GoblinRV : MonoBehaviour
             attackStunned = true;
             rb.velocity = new Vector2(0f,0f);
             savePushbackDir = other.gameObject.GetComponent<HugAttackRV>().dir;
+        } else if (other.CompareTag("TalkAttack")) {
+            stop = true;
+            stopTimer = Time.time + 0.8f;
+            hitByType = 1;
+            attackStunned = true;
+            rb.velocity = new Vector2(0f,0f);
+            savePushbackDir = other.gameObject.GetComponent<TalkAttackRV>().dir;
+        } else if (other.CompareTag("LoveAttack")) {
+            stop = true;
+            stopTimer = Time.time + 0.05f;
+            hitByType = 2;
+            attackStunned = true;
+            rb.velocity = new Vector2(0f,0f);
+            savePushbackDir = other.gameObject.GetComponent<LoveAttackRV>().dir;
         }
     }
 

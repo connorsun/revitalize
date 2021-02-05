@@ -7,6 +7,9 @@ TagManager:
   - Walls
   - Enemy
   - HugAttack
+  - EnemyAttack
+  - TalkAttack
+  - LoveAttack
   layers:
   - Default
   - TransparentFX

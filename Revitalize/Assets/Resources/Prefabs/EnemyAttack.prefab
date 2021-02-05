@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 4006625516578594527}
   m_Layer: 0
   m_Name: EnemyAttack
-  m_TagString: HugAttack
+  m_TagString: EnemyAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -80,7 +80,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.75, y: 1}
+  m_Size: {x: 0.3, y: 0.3}
   m_EdgeRadius: 0
 --- !u!212 &405883441136824021
 SpriteRenderer:

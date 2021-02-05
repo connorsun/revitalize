@@ -18,8 +18,13 @@ public class DungeonPlayerRV : MonoBehaviour
     private int frameCounter;
     private Vector2 dir;
     public bool inputDisable;
-    private float inputDisableTimer = -9.0f;
+    public float inputDisableTimer = -9.0f;
     public int health;
+    public static int resetting;
+    private bool action1Waiting;
+    private bool action2Waiting;
+    private float action1Timer;
+    private float action2Timer;
     
     // Start is called before the first frame update
     void Start()
@@ -30,20 +35,24 @@ public class DungeonPlayerRV : MonoBehaviour
 
     void Reset()
     {
-        health = 5;
+        health = 7;
         xinput = 0;
         prevxheld = false;
         prevxinput = 0;
         yinput = 0;
         prevyheld = false;
         prevyinput = 0;
-        speed = 5;
+        speed = 4.5f;
         rb.position = new Vector3(0f,0f,0f);
         rb.velocity = new Vector3(0f,0f,0f);
         xaccel = 0f;
         yaccel = 0f;
         frameCounter = 0;
         dir = new Vector2(1f,0f);
+        action1Waiting = false;
+        action1Timer = -9.0f;
+        action2Waiting = false;
+        action2Timer = -9.0f;
     }
 
     void ObjectSetup()
@@ -55,6 +64,9 @@ public class DungeonPlayerRV : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (resetting > 0) {
+            resetting --;
+        }
         frameCounter++;
         if (Time.time > inputDisableTimer && inputDisable) {
             inputDisable = false;
@@ -112,6 +124,36 @@ public class DungeonPlayerRV : MonoBehaviour
             CreateGhost();
         }
         if (Input.GetButton("Action1") && !inputDisable) {
+            if (Time.time < action2Timer) {
+                LoveAttack();
+            } else if (Time.time > action2Timer) {
+                action1Timer = Time.time + 0.03f;
+                action1Waiting = true;
+            }
+        }
+        if (Input.GetButton("Action2") && !inputDisable) {
+            if (Time.time < action1Timer) {
+                LoveAttack();
+            } else if (Time.time > action2Timer) {
+                action2Timer = Time.time + 0.03f;
+                action2Waiting = true;
+            }
+        }
+        if (!inputDisable && Time.time > action2Timer && action2Waiting) {
+            action2Waiting = false;
+            action2Timer = -9.0f;
+            GameObject hug = Instantiate(Resources.Load<GameObject>("Prefabs/TalkAttack") as GameObject);
+            hug.transform.parent = this.transform;
+            hug.transform.localPosition = new Vector3(0f,0f,0f);
+            hug.GetComponent<TalkAttackRV>().parent = gameObject;
+            inputDisable = true;
+            inputDisableTimer = Time.time + 0.8f;
+            xinput = 0;
+            yinput = 0;
+        }
+        if (!inputDisable && Time.time > action1Timer && action1Waiting) {
+            action1Waiting = false;
+            action1Timer = -9.0f;
             GameObject hug = Instantiate(Resources.Load<GameObject>("Prefabs/HugAttack") as GameObject);
             hug.transform.parent = this.transform;
             hug.transform.localPosition = dir * 0.5f;
@@ -121,6 +163,33 @@ public class DungeonPlayerRV : MonoBehaviour
             inputDisableTimer = Time.time + 0.5f;
             xinput = 0;
             yinput = 0;
+        }
+        if (health < 1) {
+            Reset();
+            resetting = 2;
+        }
+    }
+
+    void LoveAttack() {
+        action1Waiting = false;
+        action1Timer = -9.0f;
+        action2Waiting = false;
+        action2Timer = -9.0f;
+        GameObject hug = Instantiate(Resources.Load<GameObject>("Prefabs/LoveAttack") as GameObject);
+        hug.transform.parent = this.transform;
+        hug.transform.localPosition = new Vector3(0f,0f,0f);
+        inputDisable = true;
+        inputDisableTimer = Time.time + 0.3f;
+        xinput = 0;
+        yinput = 0;
+        xaccel = dir.x*20f;
+        yaccel = dir.y*20f;
+    }
+
+    void OnTriggerEnter2D(Collider2D other) {
+        if (other.CompareTag("EnemyAttack")) {
+            health -= 1;
+            Destroy(other.gameObject);
         }
     }
 
