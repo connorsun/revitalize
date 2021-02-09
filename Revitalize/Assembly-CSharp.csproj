@@ -36,15 +36,16 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\LoveAttackRV.cs" />
      <Compile Include="Assets\Scripts\PlayerTemplateRV.cs" />
      <Compile Include="Assets\Scripts\GoblinCryRV.cs" />
      <Compile Include="Assets\Scripts\DungeonPlayerRV.cs" />
      <Compile Include="Assets\Scripts\FaderRV.cs" />
      <Compile Include="Assets\Scripts\GoblinRV.cs" />
      <Compile Include="Assets\Scripts\EnemyAttackRV.cs" />
-     <Compile Include="Assets\Scripts\HugAttackRV.cs" />
      <Compile Include="Assets\Scripts\TalkAttackRV.cs" />
-     <Compile Include="Assets\Scripts\LoveAttackRV.cs" />
+     <Compile Include="Assets\Scripts\HugAttackRV.cs" />
+     <Compile Include="Assets\Scripts\CameraControllerRV.cs" />
     <Reference Include="UnityEngine">
         <HintPath>/Applications/Unity/Hub/Editor/2020.1.12f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

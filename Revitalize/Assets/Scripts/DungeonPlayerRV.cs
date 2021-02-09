@@ -70,6 +70,7 @@ public class DungeonPlayerRV : MonoBehaviour
         frameCounter++;
         if (Time.time > inputDisableTimer && inputDisable) {
             inputDisable = false;
+            sr.color = Color.white;
         }
         if (!inputDisable) {
             if (Input.GetButton("Left")  && !Input.GetButton("Right")) {
@@ -150,6 +151,7 @@ public class DungeonPlayerRV : MonoBehaviour
             inputDisableTimer = Time.time + 0.8f;
             xinput = 0;
             yinput = 0;
+            sr.color = Color.blue;
         }
         if (!inputDisable && Time.time > action1Timer && action1Waiting) {
             action1Waiting = false;
@@ -163,6 +165,7 @@ public class DungeonPlayerRV : MonoBehaviour
             inputDisableTimer = Time.time + 0.5f;
             xinput = 0;
             yinput = 0;
+            sr.color = Color.green;
         }
         if (health < 1) {
             Reset();
@@ -184,6 +187,7 @@ public class DungeonPlayerRV : MonoBehaviour
         yinput = 0;
         xaccel = dir.x*20f;
         yaccel = dir.y*20f;
+        sr.color = new Color(1f, 0.77f, 0.8f, 1f);
     }
 
     void OnTriggerEnter2D(Collider2D other) {
